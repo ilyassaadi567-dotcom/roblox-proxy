@@ -3,10 +3,12 @@ const fetch = require("node-fetch");
 
 const app = express();
 
+// Route de test
 app.get("/", (req, res) => {
   res.send("proxy ok");
 });
 
+// Route pour récupérer les gamepasses
 app.get("/gamepasses", async (req, res) => {
   const userId = req.query.userId;
   if (!userId) {
@@ -14,14 +16,17 @@ app.get("/gamepasses", async (req, res) => {
   }
 
   try {
-    const url = `https://inventory.roblox.com/v1/users/${userId}/items/GamePass`;
+    // Utilisation de RoTunnel au lieu de roblox.com
+    const url = `https://catalog.rotunnel.com/v1/search/items?creatorTargetId=${userId}&creatorType=User&assetTypes=GamePass&limit=100`;
     const response = await fetch(url);
     const data = await response.json();
 
+    // Vérification des données
     if (!data || !data.data || data.data.length === 0) {
       return res.json({ gamepasses: [] });
     }
 
+    // Formatage des gamepasses
     const gamepasses = data.data.map(gp => ({
       id: gp.id,
       name: gp.name,
@@ -36,5 +41,6 @@ app.get("/gamepasses", async (req, res) => {
   }
 });
 
+// Démarrage du serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Proxy running on port ${PORT}`));
