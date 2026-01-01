@@ -14,7 +14,7 @@ app.get("/gamepasses", async (req, res) => {
   }
 
   try {
-    const url = `https://games.roblox.com/v1/game-passes/users/${userId}`;
+    const url = `https://catalog.roblox.com/v1/search/items?creatorTargetId=${userId}&creatorType=User&assetTypes=GamePass`;
     const response = await fetch(url);
     const data = await response.json();
 
