@@ -1,3 +1,12 @@
+const express = require("express");
+const fetch = require("node-fetch");
+
+const app = express();
+
+app.get("/", (req, res) => {
+  res.send("proxy ok");
+});
+
 app.get("/gamepasses", async (req, res) => {
   const userId = req.query.userId;
   if (!userId) {
@@ -5,7 +14,7 @@ app.get("/gamepasses", async (req, res) => {
   }
 
   try {
-    const url = `https://games.roproxy.com/v1/game-passes/users/${userId}`;
+    const url = `https://games.roblox.com/v1/game-passes/users/${userId}`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -28,6 +37,4 @@ app.get("/gamepasses", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("Proxy running on port", PORT);
-});
+app.listen(PORT, () => console.log(`Proxy running on port ${PORT}`));
