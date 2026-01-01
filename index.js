@@ -3,12 +3,10 @@ const fetch = require("node-fetch");
 
 const app = express();
 
-// route test (pour voir si le proxy marche)
 app.get("/", (req, res) => {
-  res.send("Proxy OK");
+  res.send("proxy ok");
 });
 
-// route pour récupérer les gamepasses d'un joueur
 app.get("/gamepasses", async (req, res) => {
   const userId = req.query.userId;
   if (!userId) {
@@ -16,16 +14,29 @@ app.get("/gamepasses", async (req, res) => {
   }
 
   try {
-    const url = `https://catalog.roblox.com/v1/game-passes?creatorType=User&creatorTargetId=${userId}&limit=50`;
+    const url =
+      `https://catalog.roblox.com/v1/search/items/details` +
+      `?Category=11` +
+      `&Subcategory=5` +
+      `&CreatorType=User` +
+      `&CreatorTargetId=${userId}` +
+      `&SortType=4` +
+      `&Limit=30`;
 
     const response = await fetch(url);
     const data = await response.json();
 
     if (!data.data || data.data.length === 0) {
-      return res.json({ error: "No gamepasses found" });
+      return res.json({ error: "No user-created gamepasses found" });
     }
 
-    res.json(data);
+    const cleaned = data.data.map(gp => ({
+      id: gp.id,
+      name: gp.name,
+      price: gp.price ?? 0
+    }));
+
+    res.json(cleaned);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch gamepasses" });
