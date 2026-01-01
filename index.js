@@ -1,29 +1,33 @@
-const express = require("express");
+constconst express = require("express");
 const fetch = require("node-fetch");
 const app = express();
 
-const PORT = process.env.PORT || 3000;
-
-// Route test (OBLIGATOIRE)
-app.get("/", (req, res) => {
-  res.send("PROXY OK");
-});
-
 app.get("/gamepasses", async (req, res) => {
+  const gameId = req.query.gameId;
   const userId = req.query.userId;
-  if (!userId) return res.status(400).json({ error: "Missing userId" });
+
+  if (!gameId || !userId) {
+    return res.status(400).json({ error: "Missing gameId or userId" });
+  }
 
   try {
-    const url = `https://catalog.roproxy.com/v1/search/items/details?Category=11&Subcategory=5&CreatorTargetId=${userId}&SortType=4&SortAggregation=5&Limit=30`;
+    const url = `https://games.roblox.com/v1/games/${gameId}/game-passes?limit=50`;
     const response = await fetch(url);
     const data = await response.json();
-    res.json(data);
+
+    // Filtre les gamepasses créés par le joueur
+    const filtered = data.data.filter(
+      gp => gp.creator && gp.creator.id == userId
+    );
+
+    res.json(filtered);
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Failed to fetch gamepasses" });
   }
 });
 
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
+  console.log("Proxy running on port", PORT);
 });
