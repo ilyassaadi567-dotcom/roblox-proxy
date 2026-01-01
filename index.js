@@ -2,6 +2,13 @@ const express = require("express");
 const fetch = require("node-fetch");
 const app = express();
 
+const PORT = process.env.PORT || 3000;
+
+// Route test (OBLIGATOIRE)
+app.get("/", (req, res) => {
+  res.send("PROXY OK");
+});
+
 app.get("/gamepasses", async (req, res) => {
   const userId = req.query.userId;
   if (!userId) return res.status(400).json({ error: "Missing userId" });
@@ -17,5 +24,6 @@ app.get("/gamepasses", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Proxy running on port " + PORT));
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
+});
